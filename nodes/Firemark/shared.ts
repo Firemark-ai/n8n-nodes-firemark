@@ -126,7 +126,6 @@ export const engineOption: INodeProperties = {
 		{ name: 'AI Mode', value: 'ai_mode' },
 		{ name: 'AI Overviews', value: 'ai_overviews' },
 		{ name: 'ChatGPT', value: 'chatgpt' },
-		{ name: 'Claude', value: 'claude' },
 		{ name: 'Gemini', value: 'gemini' },
 		{ name: 'Perplexity', value: 'perplexity' },
 	],
