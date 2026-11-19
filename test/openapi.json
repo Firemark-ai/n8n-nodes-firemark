@@ -6247,6 +6247,133 @@
             ],
             "description": "ChatGPT's alone: the brand's own pages that came back to its answers, from the fan-outs. A period does not cut its window. Null when the fan-outs could not be read."
           },
+          "perplexity_read": {
+            "description": "Perplexity's alone (added November 2026): pages it read (retrieved for the answer, cited or not) against the pages it cited, in the selected run. Absent when the run did not ask Perplexity or the read could not be made.",
+            "type": "object",
+            "properties": {
+              "engine": {
+                "type": "string",
+                "const": "perplexity"
+              },
+              "engine_label": {
+                "type": "string"
+              },
+              "run": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "date": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "date"
+                ]
+              },
+              "known": {
+                "type": "boolean",
+                "description": "False: the run's responses carried no read list (collected before the vendor gave it). Not known, never zero; only `line` and `note` follow."
+              },
+              "answers": {
+                "description": "Perplexity answers in the selection whose read list is known: the base of every count here.",
+                "type": "integer"
+              },
+              "own_read": {
+                "description": "Answers that read one of the brand's own pages.",
+                "type": "integer"
+              },
+              "own_cited": {
+                "description": "Answers that cited one of the brand's own pages.",
+                "type": "integer"
+              },
+              "own_read_not_cited": {
+                "description": "Answers that read one of the brand's own pages and cited none.",
+                "type": "integer"
+              },
+              "pages_read": {
+                "description": "Pages read, summed over the answers.",
+                "type": "integer"
+              },
+              "pages_read_cited": {
+                "description": "Of `pages_read`, those the same answer also cited.",
+                "type": "integer"
+              },
+              "total_pages": {
+                "type": "integer"
+              },
+              "pages": {
+                "description": "The brand's own pages read or cited: answers per page, most read first.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string"
+                    },
+                    "read": {
+                      "type": "integer"
+                    },
+                    "cited": {
+                      "type": "integer"
+                    },
+                    "read_not_cited": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "url",
+                    "read",
+                    "cited",
+                    "read_not_cited"
+                  ]
+                }
+              },
+              "competitors": {
+                "description": "Per tracked competitor: answers that read one of its pages, and that cited one.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "read": {
+                      "type": "integer"
+                    },
+                    "cited": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "read",
+                    "cited"
+                  ]
+                }
+              },
+              "line": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "engine",
+              "engine_label",
+              "run",
+              "known",
+              "line",
+              "note"
+            ]
+          },
           "period": {
             "description": "With a period (`range`, `from`, `to`).",
             "$ref": "#/components/schemas/Period"
@@ -6684,7 +6811,7 @@
       },
       "ResultsDocument": {
         "title": "Results document for one publication (v3)",
-        "description": "Counts, history, ranks, competitors, sources, the answer grid, ranges and claim records. Types: src/lib/docs/types.ts (ResultsDoc).",
+        "description": "Counts, history, ranks, competitors, sources, the answer grid, ranges and claim records.",
         "type": "object",
         "required": [
           "schema",
@@ -8357,7 +8484,7 @@
       },
       "PromptsDocument": {
         "title": "Prompts document for one publication (v3)",
-        "description": "Per prompt: tags, a verdict per engine and history marks. No snippets: they load with the answer panel. Types: src/lib/docs/types.ts (PromptsDoc).",
+        "description": "Per prompt: tags, a verdict per engine and history marks. No snippets: they load with the answer panel.",
         "type": "object",
         "required": [
           "schema",
