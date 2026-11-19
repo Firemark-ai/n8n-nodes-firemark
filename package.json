@@ -1,0 +1,62 @@
+{
+	"name": "n8n-nodes-firemark",
+	"version": "0.1.0",
+	"description": "Read your Firemark AI visibility results in n8n: brands, results, prompts, runs, answers and Digital PR.",
+	"license": "MIT",
+	"homepage": "https://github.com/Firemark-ai/n8n-nodes-firemark#readme",
+	"keywords": [
+		"n8n-community-node-package",
+		"n8n",
+		"firemark",
+		"ai-visibility",
+		"ai-search"
+	],
+	"author": {
+		"name": "Firemark",
+		"email": "support@tenpointlabs.com",
+		"url": "https://tryfiremark.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Firemark-ai/n8n-nodes-firemark.git"
+	},
+	"bugs": {
+		"url": "https://github.com/Firemark-ai/n8n-nodes-firemark/issues"
+	},
+	"engines": {
+		"node": ">=22"
+	},
+	"scripts": {
+		"build": "n8n-node build",
+		"build:watch": "tsc --watch",
+		"dev": "n8n-node dev",
+		"lint": "n8n-node lint",
+		"lint:fix": "n8n-node lint --fix",
+		"test": "node --test test/",
+		"release": "n8n-node release",
+		"prepublishOnly": "n8n-node prerelease"
+	},
+	"files": [
+		"dist"
+	],
+	"n8n": {
+		"n8nNodesApiVersion": 1,
+		"strict": true,
+		"credentials": [
+			"dist/credentials/FiremarkApi.credentials.js"
+		],
+		"nodes": [
+			"dist/nodes/Firemark/Firemark.node.js"
+		]
+	},
+	"devDependencies": {
+		"@n8n/node-cli": "*",
+		"eslint": "9.39.4",
+		"prettier": "3.8.3",
+		"release-it": "20.2.0",
+		"typescript": "5.9.3"
+	},
+	"peerDependencies": {
+		"n8n-workflow": "*"
+	}
+}
