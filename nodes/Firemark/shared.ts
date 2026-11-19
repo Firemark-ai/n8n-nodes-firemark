@@ -2,7 +2,8 @@ import type { INodeProperties } from 'n8n-workflow';
 
 export const BASE_URL = 'https://app.tryfiremark.com/api/v1';
 
-export function brandLocator(resource: string[]): INodeProperties {
+/** The brand picker; shown for `resource` only when one is given (the trigger has no resources). */
+export function brandLocator(resource?: string[]): INodeProperties {
 	return {
 		displayName: 'Brand',
 		name: 'brand',
@@ -10,7 +11,7 @@ export function brandLocator(resource: string[]): INodeProperties {
 		default: { mode: 'list', value: '' },
 		required: true,
 		description: 'The brand to read',
-		displayOptions: { show: { resource } },
+		...(resource ? { displayOptions: { show: { resource } } } : {}),
 		modes: [
 			{
 				displayName: 'From List',
@@ -114,3 +115,88 @@ export const compareOption: INodeProperties = {
 		send: { type: 'query', property: 'compare', value: '={{ $value ? "previous" : "none" }}' },
 	},
 };
+
+export const engineOption: INodeProperties = {
+	displayName: 'Engine',
+	name: 'engine',
+	type: 'options',
+	default: 'chatgpt',
+	description: "One engine's answers. Leave the option out for every engine of the run.",
+	options: [
+		{ name: 'AI Mode', value: 'ai_mode' },
+		{ name: 'AI Overviews', value: 'ai_overviews' },
+		{ name: 'ChatGPT', value: 'chatgpt' },
+		{ name: 'Claude', value: 'claude' },
+		{ name: 'Gemini', value: 'gemini' },
+		{ name: 'Perplexity', value: 'perplexity' },
+	],
+	routing: { send: { type: 'query', property: 'engine' } },
+};
+
+export const stageOption: INodeProperties = {
+	displayName: 'Funnel Stages',
+	name: 'stage',
+	type: 'multiOptions',
+	default: [],
+	description: 'Only these funnel stages. Leave the option out for every stage.',
+	options: [
+		{ name: 'Top of Funnel', value: 'tofu' },
+		{ name: 'Middle of Funnel', value: 'mofu' },
+		{ name: 'Bottom of Funnel', value: 'bofu' },
+	],
+	routing: { send: { type: 'query', property: 'stage', value: '={{ $value.join(",") }}' } },
+};
+
+export const competitorOption: INodeProperties = {
+	displayName: 'Competitor',
+	name: 'competitor',
+	type: 'string',
+	default: '',
+	placeholder: 'e.g. Rivalco',
+	description: "One tracked competitor's name, ignoring case",
+	routing: { send: { type: 'query', property: 'competitor' } },
+};
+
+export const runsOption: INodeProperties = {
+	displayName: 'Runs Looked Back Over',
+	name: 'runs',
+	type: 'number',
+	typeOptions: { minValue: 1, maxValue: 12 },
+	default: 3,
+	description:
+		'How many runs persistence covers, the selected one included. Default 3 (with a period, its runs, at most 12).',
+	routing: { send: { type: 'query', property: 'runs' } },
+};
+
+export function limitOption(max: number): INodeProperties {
+	return {
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		typeOptions: { minValue: 1, maxValue: max },
+		default: 50,
+		description: 'Max number of results to return',
+		routing: { send: { type: 'query', property: 'limit' } },
+	};
+}
+
+export const cursorOption: INodeProperties = {
+	displayName: 'Cursor',
+	name: 'cursor',
+	type: 'string',
+	default: '',
+	description: "The previous page's next_cursor, for the next page",
+	routing: { send: { type: 'query', property: 'cursor' } },
+};
+
+/** "Split Into Items" for a list operation: one item per row of `property`, or the whole document as one item. */
+export function splitIntoItems(resource: string, what: string): INodeProperties {
+	return {
+		displayName: 'Split Into Items',
+		name: 'splitIntoItems',
+		type: 'boolean',
+		default: true,
+		description: `Whether to output one item per ${what}. Turn off to get the whole document as one item, with its statement and context.`,
+		displayOptions: { show: { resource: [resource] } },
+	};
+}

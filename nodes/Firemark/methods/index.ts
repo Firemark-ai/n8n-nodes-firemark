@@ -4,6 +4,7 @@ import type {
 	INodeListSearchResult,
 	INodePropertyOptions,
 } from 'n8n-workflow';
+import { publishedRuns } from '../runLog';
 import { BASE_URL } from '../shared';
 
 interface FiremarkGroup {
@@ -55,4 +56,22 @@ export async function getGroups(this: ILoadOptionsFunctions): Promise<INodePrope
 		value: g.id,
 		description: `${g.prompts} prompts`,
 	}));
+}
+
+export async function searchRuns(
+	this: ILoadOptionsFunctions,
+	filter?: string,
+): Promise<INodeListSearchResult> {
+	const brandId = this.getCurrentNodeParameter('brand', { extractValue: true }) as string;
+	if (!brandId) return { results: [] };
+	const needle = (filter ?? '').toLowerCase();
+	const runs = await publishedRuns(this, brandId);
+	return {
+		results: runs
+			.map((r) => ({
+				name: `Run ${r.index ?? '?'} · ${r.date}${r.is_latest ? ' (latest)' : ''}`,
+				value: r.run_id,
+			}))
+			.filter((r) => !needle || r.name.toLowerCase().includes(needle) || r.value.includes(needle)),
+	};
 }

@@ -1,7 +1,7 @@
 {
 	"name": "n8n-nodes-firemark",
 	"version": "0.1.0",
-	"description": "Read your Firemark AI visibility results in n8n: brands, results, prompts, runs, answers and Digital PR.",
+	"description": "Read your Firemark AI visibility results in n8n: brands, results, prompts, runs, answers, Digital PR, changes, gaps, competitors and engines, and a trigger for new runs.",
 	"license": "MIT",
 	"homepage": "https://github.com/Firemark-ai/n8n-nodes-firemark#readme",
 	"keywords": [
@@ -46,7 +46,8 @@
 			"dist/credentials/FiremarkApi.credentials.js"
 		],
 		"nodes": [
-			"dist/nodes/Firemark/Firemark.node.js"
+			"dist/nodes/Firemark/Firemark.node.js",
+			"dist/nodes/FiremarkTrigger/FiremarkTrigger.node.js"
 		]
 	},
 	"devDependencies": {

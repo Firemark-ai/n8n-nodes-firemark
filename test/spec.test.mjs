@@ -15,6 +15,7 @@ const spec = JSON.parse(
 );
 const { Firemark } = require(`${root}dist/nodes/Firemark/Firemark.node.js`);
 const { FiremarkApi } = require(`${root}dist/credentials/FiremarkApi.credentials.js`);
+const { FiremarkTrigger } = require(`${root}dist/nodes/FiremarkTrigger/FiremarkTrigger.node.js`);
 
 const node = new Firemark().description;
 const props = node.properties;
@@ -132,6 +133,11 @@ test("the brief's operations are all covered", () => {
 		'listRuns',
 		'getPromptAnswers',
 		'getDigitalPr',
+		'getChanges',
+		'listGaps',
+		'listSourceGaps',
+		'listCompetitors',
+		'listEngines',
 	]) {
 		assert.ok(covered.includes(id), `${id} is reachable from the node`);
 	}
@@ -156,6 +162,79 @@ test('the credential sends a Bearer key and is tested against GET /brands', () =
 });
 
 test("item splitting uses the spec's array properties", () => {
-	assert.ok(spec.components.schemas.BrandsResponse.properties.brands);
-	assert.ok(spec.components.schemas.RunsResponse.properties.runs);
+	const schemas = spec.components.schemas;
+	assert.ok(schemas.BrandsResponse.properties.brands);
+	assert.ok(schemas.RunsResponse.properties.runs);
+	// Every rootProperty a postReceive splits on is an array in that operation's 200 body.
+	for (const { resource, op } of cases) {
+		const url = evalExpr(op.routing.request.url, { ...SAMPLE });
+		const body = spec.paths[toTemplate(url)].get.responses['200'].content['application/json'].schema;
+		const schema = body.$ref ? schemas[body.$ref.split('/').pop()] : body;
+		for (const step of op.routing.output?.postReceive ?? []) {
+			if (step.type !== 'rootProperty') continue;
+			const prop = schema.properties?.[step.properties.property];
+			assert.ok(prop, `${resource}.${op.value} splits on ${step.properties.property}`);
+			assert.equal(prop.type, 'array', `${step.properties.property} is an array`);
+		}
+	}
+});
+
+test('Change → Get sends since (picked, or the run before the latest) as the spec names it', async () => {
+	const change = props.find((p) => p.name === 'operation' && p.displayOptions?.show?.resource?.includes('change'));
+	const op = change.options[0];
+	assert.ok(spec.paths['/brands/{brand}/changes'].get.parameters.some((p) => p.in === 'query' && p.name === 'since'));
+	const [preSend] = op.routing.send.preSend;
+	const runs = [
+		{ run_id: 'r1', date: '2026-10-11', index: 1, status: 'published', is_latest: false },
+		{ run_id: 'r3', date: '2026-10-25', index: 3, status: 'published', is_latest: true },
+		{ run_id: 'r4', date: '2026-11-01', index: null, status: 'failed', is_latest: false },
+		{ run_id: 'r2', date: '2026-10-18', index: 2, status: 'published', is_latest: false },
+	];
+	const ctx = (since) => ({
+		getNodeParameter: (name) => (name === 'brand' ? 'BRAND-ID' : since),
+		helpers: { httpRequestWithAuthentication: async (_cred, req) => (assert.match(req.url, /\/brands\/BRAND-ID\/runs$/), { runs }) },
+	});
+	assert.deepEqual((await preSend.call(ctx(''), { qs: {} })).qs, { since: 'r2' });
+	assert.deepEqual((await preSend.call(ctx('r1'), { qs: {} })).qs, { since: 'r1' });
+});
+
+test('the trigger polls the run log: nothing on first activation, then one item per newly published run, with changes', async () => {
+	const trigger = new FiremarkTrigger();
+	assert.equal(trigger.description.polling, true);
+	assert.deepEqual(trigger.description.inputs, []);
+	assert.ok(spec.paths['/brands/{brand}/runs'].get);
+	const published = (ids) => ids.map((id, i) => ({ run_id: id, date: `2026-10-${10 + i}`, index: i + 1, status: 'published', is_latest: i === ids.length - 1 }));
+	let log = published(['r1', 'r2']);
+	const calls = [];
+	const staticData = {};
+	const ctx = (params, mode = 'trigger') => ({
+		getNodeParameter: (name, fallback) => (name in params ? params[name] : fallback),
+		getWorkflowStaticData: () => staticData,
+		getMode: () => mode,
+		helpers: {
+			httpRequestWithAuthentication: async (cred, req) => {
+				assert.equal(cred, 'firemarkApi');
+				calls.push(req);
+				if (req.url.endsWith('/runs')) return { runs: [...log].reverse() };
+				return { statement: ['changes'], since: req.qs.since ?? null };
+			},
+		},
+	});
+	const params = { brand: 'BRAND-ID', includeChanges: true };
+	assert.equal(await trigger.poll.call(ctx(params)), null);
+	assert.equal(staticData.lastRunId, 'r2');
+	assert.equal(await trigger.poll.call(ctx(params)), null);
+	log = published(['r1', 'r2', 'r3', 'r4']);
+	const [items] = await trigger.poll.call(ctx(params));
+	assert.deepEqual(items.map((i) => i.json.run_id), ['r3', 'r4']);
+	assert.deepEqual(items.map((i) => i.json.changes.since), ['r2', 'r3']);
+	const changeCalls = calls.filter((c) => c.url.endsWith('/changes'));
+	assert.ok(changeCalls.every((c) => spec.paths['/brands/{brand}/changes'].get.parameters.some((p) => p.name === Object.keys(c.qs)[0])));
+	assert.equal(staticData.lastRunId, 'r4');
+	assert.equal(await trigger.poll.call(ctx(params)), null);
+	// A manual test shows the latest run and remembers nothing.
+	const [manual] = await trigger.poll.call(ctx({ brand: 'BRAND-ID', includeChanges: false }, 'manual'));
+	assert.deepEqual(manual.map((i) => i.json.run_id), ['r4']);
+	assert.equal(manual[0].json.changes, undefined);
+	assert.equal(staticData.lastRunId, 'r4');
 });

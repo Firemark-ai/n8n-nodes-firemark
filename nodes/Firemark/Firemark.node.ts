@@ -1,12 +1,17 @@
 import { NodeConnectionTypes, type INodeType, type INodeTypeDescription } from 'n8n-workflow';
-import { getGroups, searchBrands } from './methods';
+import { getGroups, searchBrands, searchRuns } from './methods';
 import { BASE_URL } from './shared';
 import { answerDescription } from './resources/answer';
 import { brandDescription } from './resources/brand';
+import { changeDescription } from './resources/change';
+import { competitorDescription } from './resources/competitor';
 import { digitalPrDescription } from './resources/digitalPr';
+import { engineDescription } from './resources/engine';
+import { gapDescription } from './resources/gap';
 import { promptDescription } from './resources/prompt';
 import { resultDescription } from './resources/result';
 import { runDescription } from './resources/run';
+import { sourceGapDescription } from './resources/sourceGap';
 
 export class Firemark implements INodeType {
 	description: INodeTypeDescription = {
@@ -44,24 +49,34 @@ export class Firemark implements INodeType {
 				options: [
 					{ name: 'Answer', value: 'answer' },
 					{ name: 'Brand', value: 'brand' },
+					{ name: 'Change', value: 'change' },
+					{ name: 'Competitor', value: 'competitor' },
 					{ name: 'Digital PR', value: 'digitalPr' },
+					{ name: 'Engine', value: 'engine' },
+					{ name: 'Gap', value: 'gap' },
 					{ name: 'Prompt', value: 'prompt' },
 					{ name: 'Result', value: 'result' },
 					{ name: 'Run', value: 'run' },
+					{ name: 'Source Gap', value: 'sourceGap' },
 				],
 				default: 'brand',
 			},
 			...answerDescription,
 			...brandDescription,
+			...changeDescription,
+			...competitorDescription,
 			...digitalPrDescription,
+			...engineDescription,
+			...gapDescription,
 			...promptDescription,
 			...resultDescription,
 			...runDescription,
+			...sourceGapDescription,
 		],
 	};
 
 	methods = {
-		listSearch: { searchBrands },
+		listSearch: { searchBrands, searchRuns },
 		loadOptions: { getGroups },
 	};
 }
