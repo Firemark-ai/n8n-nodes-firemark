@@ -8069,7 +8069,7 @@
               },
               "known": {
                 "type": "boolean",
-                "description": "False: the run's responses carried no read list (collected before the vendor gave it). Not known, never zero; only `line` and `note` follow."
+                "description": "False: the run's responses carried no read list (collected before the vendor gave it). Not known, never zero; no count follows."
               },
               "answers": {
                 "description": "Perplexity answers in the selection whose read list is known: the base of every count here.",
@@ -8151,21 +8151,13 @@
                     "cited"
                   ]
                 }
-              },
-              "line": {
-                "type": "string"
-              },
-              "note": {
-                "type": "string"
               }
             },
             "required": [
               "engine",
               "engine_label",
               "run",
-              "known",
-              "line",
-              "note"
+              "known"
             ]
           },
           "period": {

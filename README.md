@@ -113,7 +113,7 @@ npm test      # checks every operation's request against test/openapi.json
 npm run dev   # starts n8n at localhost:5678 with this node loaded
 ```
 
-`test/openapi.json` is a copy of the Firemark app's `docs/openapi.json`. Set `FIREMARK_OPENAPI=/path/to/openapi.json` to check against a newer spec.
+`test/openapi.json` is a copy of the published spec at `https://app.tryfiremark.com/api/v1/openapi.json`. Set `FIREMARK_OPENAPI=/path/to/openapi.json` to check against a newer spec.
 
 ### Releasing
 
