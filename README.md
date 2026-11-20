@@ -95,6 +95,10 @@ Another: Schedule Trigger → Firemark (Brand → Get Many) → Firemark (Gap �
 
 ## Version history
 
+### 0.1.1
+
+Published from GitHub Actions with npm provenance.
+
 ### 0.1.0
 
 First release, read-only: Brand, Result, Prompt, Run, Answer, Digital PR, Change, Gap, Source Gap, Competitor and Engine; Firemark Trigger (On New Run Published).

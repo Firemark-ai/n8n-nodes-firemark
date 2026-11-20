@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+
+- Published from GitHub Actions with an npm provenance statement. Publication versions are encoded in request paths.
+
 ## 0.1.0
 
 - First release, read-only, with the Firemark API credential: Brand (Get Many), Result (Get), Prompt (Get), Run (Get Many), Answer (Get Many) and Digital PR (Get).
