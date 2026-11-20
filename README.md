@@ -117,7 +117,7 @@ npm run dev   # starts n8n at localhost:5678 with this node loaded
 
 ### Releasing
 
-Releases are published to npm from GitHub Actions with a provenance statement (`.github/workflows/publish.yml`), using npm Trusted Publishing, so no npm token is stored in the repository. Run `npm run release` on `main`: it lints, builds, bumps the version, updates the changelog, tags and pushes, and the tag starts the publish workflow.
+Releases are published to npm from GitHub Actions with a provenance statement (`.github/workflows/publish.yml`), using npm Trusted Publishing, so no npm token is stored in the repository. Each publish waits for approval on the repository's `npm` environment, and only runs for a tag that matches the `package.json` version on a commit already on `main`. Run `npm run release` on `main`: it lints, builds, bumps the version, updates the changelog, tags and pushes, and the tag starts the publish workflow.
 
 ## License
 

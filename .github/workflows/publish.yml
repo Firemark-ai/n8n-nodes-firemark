@@ -10,7 +10,7 @@
 #   Organization:     Firemark-ai
 #   Repository:       n8n-nodes-firemark
 #   Workflow:         publish.yml
-#   Environment:      (blank)
+#   Environment:      npm
 # The package must exist on npm before a Trusted Publisher can be added, so the
 # first version may need a one-off manual publish; see README "Releasing".
 #
@@ -28,6 +28,9 @@ jobs:
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
+    # Publishing waits for a reviewer's approval on the npm environment, and npm's
+    # Trusted Publisher accepts tokens from this environment only.
+    environment: npm
 
     permissions:
       # Mints the OIDC token for Trusted Publishing and the provenance statement.
@@ -35,18 +38,33 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # Only a tag that matches package.json's version, on a commit already on
+      # main, may publish.
+      - name: Check the tag
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "$GITHUB_REF_NAME" != "$version" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match package.json version $version"; exit 1
+          fi
+          git fetch --no-tags origin main
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "Tag $GITHUB_REF_NAME is not on main"; exit 1
+          fi
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           registry-url: 'https://registry.npmjs.org'
-          cache: 'npm'
 
-      # Trusted Publishing needs npm 11.5.1 or later.
+      # Trusted Publishing needs npm 11.5.1 or later; pinned, not latest.
       - name: Update npm
-        run: npm install -g npm@latest
+        run: npm install -g npm@11.21.3
 
       - name: Install dependencies
         run: npm ci

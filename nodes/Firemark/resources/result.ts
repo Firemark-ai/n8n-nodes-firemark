@@ -20,7 +20,7 @@ export const resultDescription: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'GET',
-						url: '={{ "/brands/" + encodeURIComponent($parameter.brand) + ($parameter.source === "version" ? "/publications/" + $parameter.version : "") + "/results" }}',
+						url: '={{ "/brands/" + encodeURIComponent($parameter.brand) + ($parameter.source === "version" ? "/publications/" + encodeURIComponent(String($parameter.version)) : "") + "/results" }}',
 					},
 				},
 			},

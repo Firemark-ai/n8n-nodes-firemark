@@ -1,6 +1,7 @@
 // Checks every operation's request (method, path, query parameters and their
 // values) against the Firemark OpenAPI spec. Run after `npm run build`.
-// test/openapi.json is a copy of docs/openapi.json from the Firemark app; set
+// test/openapi.json is a copy of the published spec at
+// https://app.tryfiremark.com/api/v1/openapi.json; set
 // FIREMARK_OPENAPI to another path to check against a newer one.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

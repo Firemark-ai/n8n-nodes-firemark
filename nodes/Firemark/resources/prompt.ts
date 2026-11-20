@@ -20,7 +20,7 @@ export const promptDescription: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'GET',
-						url: '={{ "/brands/" + encodeURIComponent($parameter.brand) + ($parameter.source === "version" ? "/publications/" + $parameter.version : "") + "/prompts" }}',
+						url: '={{ "/brands/" + encodeURIComponent($parameter.brand) + ($parameter.source === "version" ? "/publications/" + encodeURIComponent(String($parameter.version)) : "") + "/prompts" }}',
 					},
 				},
 			},
