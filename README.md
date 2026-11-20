@@ -95,13 +95,9 @@ Another: Schedule Trigger → Firemark (Brand → Get Many) → Firemark (Gap �
 
 ## Version history
 
-### Unreleased
-
-Change, Gap, Source Gap, Competitor and Engine; Firemark Trigger (On New Run Published).
-
 ### 0.1.0
 
-First release: Brand, Result, Prompt, Run, Answer and Digital PR, read-only.
+First release, read-only: Brand, Result, Prompt, Run, Answer, Digital PR, Change, Gap, Source Gap, Competitor and Engine; Firemark Trigger (On New Run Published).
 
 ## Development
 
